@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bitcamp.travelmaker.mypage.dao.MessageDAO">
+	<insert  id="insertMessage" parameterType="java.util.HashMap">
+	<selectKey keyProperty="n_Num" resultType="int" order="BEFORE">
+		select n_Seq.nextval from dual
+		</selectKey>
+		insert into note (n_Num,m_Remail,N_CONTENT,M_SEMAIL,M_REGDATE,N_STATUS)
+		values(#{n_Num},#{m_Remail},#{n_Content},#{m_Semail},sysdate,0)
+	</insert>
+
+	<select id="listMessage" parameterType="String" resultType="java.util.HashMap">
+	 select n_num,
+	 		m_remail,
+	 		n_content,
+	 		m_semail,
+	 		to_char(m_regdate, 'yyyy-mm-dd hh24:mi') m_regdate,
+	 		N_STATUS
+	 from note 
+	 where m_Remail=#{m_Email}
+	</select>
+	
+	<select id="SlistMessage" parameterType="String" resultType="java.util.HashMap">
+	 select n_num,
+	 		m_remail,
+	 		n_content,
+	 		m_semail,
+	 		to_char(m_regdate, 'yyyy-mm-dd hh24:mi') m_regdate,
+	 		N_STATUS
+	 from note 
+	 where m_Semail=#{m_Email}
+	</select>
+	
+	<delete id="deleteMessage"  parameterType="java.util.HashMap" >
+	delete from note where n_num in
+	<foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+	#{item}
+	</foreach>
+	</delete>
+	
+	<select id="findRemail" parameterType="String" resultType="java.lang.String">
+	select m_Email from member where m_Nickname=#{m_Nickname}
+	</select>
+	
+	<select id="count_receive_note" parameterType="String" resultType="int">
+	select count (*) from note where m_semail =#{m_Email}
+	</select>
+	
+</mapper>

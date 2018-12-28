@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bitcamp.travelmaker.gowith.dao.GowithDAO">
+
+	<insert id="insertGowith"
+		parameterType="bitcamp.travelmaker.gowith.dto.GowithDTO">
+		<selectKey order="BEFORE" keyProperty="g_Num"
+			resultType="Integer">
+			SELECT NVL(MAX(g_num),0) +1 FROM go
+		</selectKey>
+		INSERT INTO go(g_num, m_Email,g_Title,g_Content,g_Speople
+		,g_Epeople,g_Local,g_Local1,g_Longitude,g_Longitude1,g_Latitude,g_Latitude1,g_Plan,g_Sdate,g_Edate,g_Status,g_Regdate,g_Hit,g_Gender)
+		VALUES(#{g_Num}, #{m_Email,jdbcType=VARCHAR},#{g_Title}, #{g_Content},
+		#{g_Speople},
+		#{g_Epeople},#{g_Local,jdbcType=VARCHAR},#{g_Local1,jdbcType=VARCHAR},
+		#{g_Longitude,jdbcType=NUMERIC},#{g_Longitude1,jdbcType=NUMERIC},#{g_Latitude,jdbcType=NUMERIC},#{g_Latitude1,jdbcType=NUMERIC},#{g_Plan,jdbcType=VARCHAR},#{g_Sdate},#{g_Edate},#{g_Status},to_char(sysdate,('YY-MM-DD')),#{g_Hit,jdbcType=NUMERIC},#{g_Gender})
+	</insert>
+
+	<insert id="insertGimage" parameterType="java.util.HashMap">
+		INSERT INTO
+		gimage(g_NUM, gi_IMAGE)
+		VALUES(#{g_NUM}, #{gi_IMAGE})
+	</insert>
+
+	<update id="updateGowith"
+		parameterType="bitcamp.travelmaker.gowith.dto.GowithDTO">
+		update go
+		set g_Title = #{g_Title},g_Content =
+		#{g_Content}, g_Epeople =
+		#{g_Epeople},g_Sdate = #{g_Sdate},g_Edate =
+		#{g_Edate},g_Status =
+		#{g_Status},
+		g_Gender = #{g_Gender}
+		where
+		g_Num=#{g_Num}
+	</update>
+
+	<delete id="deleteGimage" parameterType="int">
+		delete from gimage where
+		g_num=#{g_Num}
+	</delete>
+
+	<update id="updateHit" parameterType="int">
+		update go
+		set g_Hit =
+		g_Hit+1
+		where g_Num=#{g_Num}
+	</update>
+
+	<select id="selectGowith" parameterType="int"
+		resultType="bitcamp.travelmaker.gowith.dto.GowithDTO">
+		select
+		a.g_Num,a.m_Email,a.g_Title,a.g_Content,a.g_Speople,a.g_Epeople,
+		a.g_Local,a.g_Local1,a.g_Longitude,a.g_Longitude1,a.g_Latitude,a.g_Latitude1,TO_CHAR(a.g_Sdate,'YYYY-MM-DD')
+		g_Sdate,
+		TO_CHAR(a.g_Edate,'YYYY-MM-DD')
+		g_Edate,a.g_Status,TO_CHAR(a.g_Regdate,'YYYY-MM-DD')
+		g_Regdate,a.g_Gender,a.g_Hit,m.m_Nickname,m.m_Image,m.m_Gender
+		from go
+		a join member m on a.m_email = m.m_email
+		where g_Num=#{g_Num}
+	</select>
+	
+	<select id="getMainGo" resultType="bitcamp.travelmaker.gowith.dto.GowithDTO">
+			select * from (select g.g_num,g.g_speople,g.g_epeople,g.g_hit,
+			g.g_title,to_char(g.g_sdate,'yyyy-mm-dd') g_sdate,to_char(g.g_edate,'yyyy-mm-dd') g_edate,g.g_gender,max(b.gi_image)as gi_image,m.m_Nickname from go g 
+			join member m on g.m_Email=m.m_Email join gimage b on g.g_Num=b.g_Num group by g.g_num,
+			g_speople,g_epeople,g_hit
+			,g_title,g_sdate,g_edate,g_gender,gi_image,m_nickname order by g.g_Hit) where rownum <![CDATA[<]]>=6 
+	</select>
+	<!--데이터 하나니까 string으로 return 해도됨 -->
+	<select id="selectImg" parameterType="integer"
+		resultType="java.lang.String">
+		select gi_Image from GIMAGE where g_Num=#{g_Num}
+	</select>
+
+
+	<delete id="deleteApp" parameterType="int">
+		delete from application
+		where g_Num = #{g_Num}
+	</delete>
+
+	<delete id="deleteGowith" parameterType="int">
+		delete from go where
+		g_Num = #{g_Num}
+	</delete>
+
+	<insert id="application" parameterType="java.util.HashMap">
+		insert into
+		application(g_Num, m_Email,ap_Regdate)
+		values(#{g_Num},#{m_Email},SYSDATE)
+	</insert>
+
+	<select id="selectApp" parameterType="int"
+		resultType="java.util.HashMap">
+		select a.g_Num, a.m_Email, a.ap_Regdate, m.M_IMAGE,
+		m.M_nickname from application a full outer join member m on
+		a.m_Email=m.M_EMAIL
+		where a.g_Num=#{g_Num} order by ap_regdate desc
+	</select>
+
+	<delete id="cancel" parameterType="java.util.HashMap">
+		delete from application where
+		G_NUM = #{g_Num} AND M_EMAIL = #{m_Email}
+	</delete>
+
+	<select id="genderCheck" parameterType="String"
+		resultType="java.lang.String">
+		select m_Gender from member where m_Email=#{m_Email}
+	</select>
+
+
+	<!--리플 -->
+	<insert id="replyreg"
+		parameterType="bitcamp.travelmaker.gowith.dto.go_ReplyDTO">
+		insert into join
+		(j_Num,m_Email,g_Num,j_Parent,j_Order,j_Comment,j_Regdate)
+		values(G_SEQ.nextval,#{m_Email},#{g_Num},0,1,#{j_Comment},to_char(sysdate,('YY-MM-DD')))
+	</insert>
+
+	<select id="replylist" parameterType="int"
+		resultType="bitcamp.travelmaker.gowith.dto.go_ReplyDTO">
+		select
+		j.j_Num,j.g_Num,m.m_Email,m.m_Nickname,m.m_Image,j.j_Parent,j.j_Order,j.j_Comment,j.j_Regdate
+		from join j join member m on j.m_Email=m.m_Email
+		where j.g_Num=#{g_Num} START WITH j_Parent=0 CONNECT BY PRIOR
+		j_Num=j_Parent
+		ORDER SIBLINGS BY j_Order asc
+	</select>
+
+	<insert id="rerereg"
+		parameterType="bitcamp.travelmaker.gowith.dto.go_ReplyDTO">
+		insert into Join
+		(j_Num,g_Num,m_Email,j_Parent,j_Order,j_Comment,j_Regdate)
+		values(G_SEQ.nextval,#{g_Num},#{m_Email},#{j_Parent},
+		<choose>
+			<when test="j_Parent != 0">
+				nvl((select * from (select j_Order+1 as j_Order from
+				join where j_Parent=#{j_Parent} order by j_Order desc) where
+				rownum=1),2)
+			</when>
+		</choose>
+		,#{j_Comment},to_char(sysdate,('YY-MM-DD')))
+	</insert>
+
+	<update id="replyupdate"
+		parameterType="bitcamp.travelmaker.gowith.dto.go_ReplyDTO">
+		update join 
+		set j_Comment=#{j_Comment} 
+		where j_Num=#{j_Num}
+	</update>
+
+	<delete id="replydelete" parameterType="int">
+		delete 
+		from join 
+		where j_Num=#{j_Num}
+	</delete>
+
+
+	<!-- 페이징 ROWNUM Query -->
+	<select id="selectAllGowith"
+		parameterType="bitcamp.travelmaker.paging.PagingVo"
+		resultType="bitcamp.travelmaker.gowith.dto.GowithDTO">
+		SELECT *
+		FROM ( SELECT ROWNUM RNUM, P.*
+		FROM ( SELECT a.g_num,
+		a.m_email,a.G_TITLE,a.G_CONTENT,a.g_SPEOPLE,a.g_EPEOPLE,TO_CHAR(a.g_Sdate,'YYYY-MM-DD')
+		g_SDATE,TO_CHAR(a.g_EDATE,'YYYY-MM-DD')
+		g_EDATE,g_Status,TO_CHAR(a.g_Regdate,'YYYY-MM-DD')
+		g_Regdate,a.g_Hit,a.g_Gender ,max(b.gi_image)as
+		gi_image,m.m_Nickname,m_Image,m_Gender
+		FROM go a full outer join gimage
+		b on a.G_NUM = b.G_NUM
+		join member m on a.m_email = m.m_email
+		where 1=1 <!--조회 
+			조건 -->
+		<if
+			test="searchFiled != null and searchFiled != '' and searchFiled != 'ALL' and searchFiled != 'join'"> <!-- searchFiled = 조회조건, searchValue = 검색어 -->
+			AND lower(${searchFiled}) LIKE lower('%${searchValue}%')
+		</if>
+		<if test="searchFiled == 'ALL'"> <!-- searchFiled = 조회조건, searchValue = 검색어 -->
+			AND (lower(a.G_TITLE) LIKE lower('%${searchValue}%')
+			OR
+			lower(a.G_CONTENT) LIKE lower('%${searchValue}%')
+			OR
+			lower(m.m_Nickname) LIKE lower('%${searchValue}%'))
+		</if>
+		<if test="searchFiled == 'join'">
+			AND a.g_Status ='Y'
+		</if>
+
+		group by a.g_num,
+		a.m_email,a.G_TITLE,a.G_CONTENT,a.g_SPEOPLE,a.g_EPEOPLE,a.g_SDATE,a.g_EDATE,g_Status,a.g_Regdate,a.g_Hit,a.g_Gender,m.m_Nickname,m_Image,m_Gender
+		ORDER BY a.G_NUM DESC ) P
+		WHERE ROWNUM<![CDATA[<]]>=#{last}
+		) Q
+		WHERE Q.RNUM <![CDATA[>]]>=#{start}
+	</select>
+
+	<!-- 페이징 Total Query -->
+	<select id="totalSelect"
+		parameterType="bitcamp.travelmaker.paging.PagingVo"
+		resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM go a join member m on a.m_email = m.m_email
+		where
+		1=1
+		<if
+			test="searchFiled != null and searchFiled != '' and searchFiled != 'ALL' and searchFiled != 'join'"> <!-- searchFiled = 조회조건, searchValue = 검색어 -->
+			AND lower(${searchFiled}) LIKE lower('%${searchValue}%')
+		</if>
+		<if test="searchFiled == 'ALL'">
+			AND (lower(a.G_TITLE) LIKE lower('%${searchValue}%')
+			OR
+			lower(a.G_CONTENT) LIKE lower('%${searchValue}%')
+			OR
+			lower(m.m_Nickname) LIKE lower('%${searchValue}%'))
+		</if>
+		<if test="searchFiled == 'join'">
+			AND a.g_Status ='Y'
+		</if>
+	</select>
+
+
+
+	<select id="getWithListMypage" parameterType="String"
+		resultType="bitcamp.travelmaker.gowith.dto.GowithDTO">
+		select * from go where m_Email = #{m_Email}
+	</select>
+
+	<select id="getWithListAdmin" parameterType="String"
+		resultType="bitcamp.travelmaker.gowith.dto.GowithDTO">
+		select * from go where m_Email = #{m_Email}
+	</select>
+
+
+</mapper>

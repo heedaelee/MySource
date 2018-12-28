@@ -1,0 +1,38 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style type="text/css">
+	input {
+	width: 300px;
+}
+</style>
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script type="text/javascript">
+window.onload = function(){
+	$.urlParam = function(name){
+	    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+	    return results[1] || 0;
+	}
+
+	var str = $.urlParam('code');
+	$('#code').val(str);
+}
+</script>
+</head>
+
+<body>
+	<a href="login.html">login</a>
+	<form action="https://www.googleapis.com/oauth2/v4/token" method="post" enctype="application/x-www-form-urlencoded">
+		code : <input type="text" name="code" id=code value="4/P7q7W91a-oMsCeLvIaQm6bTrgtp7"><br>
+		client_id : <input type="text" name="client_id" value="281172959488-fhgtk20r233g047qts39bl39q2npmkq3.apps.googleusercontent.com"><br>
+		client_secret : <input type="text" name="client_secret" value="RYSnByOkxCRvQbVhx2miTvlz"><br>
+		redirect_uri : <input type="text" name="redirect_uri" value="http://localhost:8080/test/receiveCode.html"><br><!--form이 자동으로  url 인코딩 해줌  -->
+		grant_type : <input type="text" name="grant_type" value="authorization_code"><br>
+	<input type="submit">
+	</form>
+
+</body>
+</html>

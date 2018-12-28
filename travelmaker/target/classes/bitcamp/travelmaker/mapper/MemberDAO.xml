@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bitcamp.travelmaker.dao.MemberDAO">
+	<insert id="insertMember" parameterType="bitcamp.travelmaker.dto.MemberDTO">
+		insert into member(m_Email, m_nickname, m_pwd, 
+		<choose>
+		 <when test="m_Image!= null">
+		 		m_Image,
+		 </when>
+		</choose> m_regdate,enabled,m_social
+		<choose>
+		<when test="m_Gender==null">
+			)
+		</when>
+		<otherwise>
+			,m_gender)
+		</otherwise>
+		</choose>
+		values(#{m_Email}, #{m_Nickname}, #{m_Pwd},
+		<choose>
+		 <when test="m_Image!=null">
+		 	#{m_Image},
+		 </when>
+		</choose> to_char(sysdate,('YY-MM-DD')),1,0
+		<choose>
+		<when test="m_Gender==null">
+			)
+		</when>
+		<otherwise>
+			, #{m_Gender})
+		</otherwise>
+		</choose>	
+	</insert>
+	<insert id="socialinsertMember" parameterType="bitcamp.travelmaker.dto.MemberDTO">
+		insert into member(m_Email, m_nickname, m_pwd, 
+		<choose>
+		 <when test="m_Image!= null">
+		 		m_Image,
+		 </when>
+		</choose> m_regdate,enabled,m_social,m_gender)
+		values(#{m_Email}, #{m_Nickname}, #{m_Pwd},
+		<choose>
+		 <when test="m_Image!=null">
+		 	#{m_Image},
+		 </when>
+		</choose> to_char(sysdate,('YY-MM-DD')),1,1,#{m_Gender})
+	</insert>
+	<select id="idCheck" resultType="int">
+		select count(*) from member where m_Email = #{m_Email}
+	</select>
+	<insert id="insertRoll" parameterType="String">
+		insert into MAUTHORITY(A_CODE,m_EMAIL)
+		values(2,#{m_Email})
+	</insert>
+	<select id="getMember" parameterType="String"
+						   resultType="bitcamp.travelmaker.dto.MemberDTO">
+	 select * from member where m_Email = #{m_Email}
+	</select>
+	
+	<select id="mypageMember" parameterType="String"
+						   resultType="bitcamp.travelmaker.dto.MemberDTO">
+	 select * from member where m_Email = #{m_Email}
+	</select>
+	
+	<update id="passChange" parameterType="bitcamp.travelmaker.dto.MemberDTO">
+		update member
+		set m_pwd = #{m_Pwd} where m_Email = #{m_Email}
+	</update>
+	
+	<update id="profileChange" parameterType="bitcamp.travelmaker.dto.MemberDTO">
+		update member
+		set m_image = #{m_Image} where m_Email = #{m_Email}
+	</update>
+	
+	<update id="nickChange" parameterType="bitcamp.travelmaker.dto.MemberDTO">
+		update member
+		set m_nickname = #{m_Nickname} where m_Email = #{m_Email}
+	</update>
+	
+	<select id="getPass" parameterType="String"
+							resultType="String">
+	 select m_pwd from member where m_Email = #{m_Email}
+	</select>
+	
+	<delete id="deleteMember" parameterType="String">
+	 delete from member where m_Email = #{m_Email}
+	</delete>
+	<delete id="deleteRoll" parameterType="String">
+		delete from mauthority where m_email = #{m_Email}
+	</delete>
+	<delete id="addeleteRoll" parameterType="String">
+		delete from mauthority where m_email = #{m_Email}
+	</delete>
+	
+	<delete id="adminDeleteMember" parameterType="String">
+		delete from member where m_Email = #{m_Email}
+	</delete>
+	
+	<!-- 회원목록 전체조회 --> 	
+	<select id="getMemberList" parameterType="hashmap" 
+                           resultType="bitcamp.travelmaker.dto.MemberDTO">
+       select M_NICKNAME, M_EMAIL from member
+ 	</select>
+<!-- 회원 수정 가져오기  -->
+	<select id="getMemberUpdate" parameterType="String" 
+						 	resultType="bitcamp.travelmaker.dto.MemberDTO">
+	   select * from member where m_Email = #{m_Email} 
+	</select>
+	
+	<select id="getPassword" parameterType="String"
+							resultType="String">
+	 select m_pwd from member where m_Email = #{m_Email}
+	</select>
+	
+	<!-- 관리자 회원 검색	 -->
+	<select id="searchMember" parameterType="java.util.Map" 
+							  resultType="bitcamp.travelmaker.dto.MemberDTO">
+		select m_nickname, m_email 
+			from member
+		    where ${selectbox}
+			like '%'||#{keyword}||'%' 
+	</select>
+	
+	<select id="getBlackList" parameterType="hashmap" 
+                           resultType="bitcamp.travelmaker.dto.BlacklistDTO">
+       select * from blacklist
+ 	</select>
+ 	
+ 	<insert id="blackinsert" parameterType="bitcamp.travelmaker.dto.BlacklistDTO">	
+		<selectKey order="BEFORE" keyProperty="b_Num" resultType="Integer">
+	    		SELECT NVL(MAX(b_num),0) +1 FROM blacklist
+	    </selectKey>
+
+		insert into blacklist values (#{b_Num}, #{m_Email}, #{b_Reason})
+	</insert>
+	
+	<delete id="deleteblack" parameterType="int">
+		delete from blacklist where b_Num = #{b_Num}
+	</delete>
+	
+	<select id="memberReport" resultType="bitcamp.travelmaker.dto.MemberDTO">
+      select   
+		    sum(decode(to_char(M_REGDATE,'MM'),'01',1,0)) as M01,
+		    sum(decode(to_char(M_REGDATE,'MM'),'02',1,0)) as M02,
+		    sum(decode(to_char(M_REGDATE,'MM'),'03',1,0)) as M03,
+		    sum(decode(to_char(M_REGDATE,'MM'),'04',1,0)) as M04,
+		    sum(decode(to_char(M_REGDATE,'MM'),'05',1,0)) as M05,
+		    sum(decode(to_char(M_REGDATE,'MM'),'06',1,0)) as M06,
+		    sum(decode(to_char(M_REGDATE,'MM'),'07',1,0)) as M07,
+		    sum(decode(to_char(M_REGDATE,'MM'),'08',1,0)) as M08,
+		    sum(decode(to_char(M_REGDATE,'MM'),'09',1,0)) as M09,
+		    sum(decode(to_char(M_REGDATE,'MM'),'10',1,0)) as M10,
+		    sum(decode(to_char(M_REGDATE,'MM'),'11',1,0)) as M11,
+		    sum(decode(to_char(M_REGDATE,'MM'),'12',1,0)) as M12
+		from member
+ 	</select>
+ 	
+ 	<select id="blacklistcheck" parameterType="String" resultType="int">
+ 		select count(*) from blacklist where m_Email=#{m_Email}
+ 	</select>
+	
+	<select id="friendsearch" parameterType="String" resultType="bitcamp.travelmaker.dto.MemberDTO">
+		select * from member where m_Nickname = #{m_Nickname}
+	</select>
+	<select id="friendsearch1" parameterType="bitcamp.travelmaker.dto.MemberDTO" resultType="bitcamp.travelmaker.dto.MemberDTO">
+		select * from member m join friend f on m.m_Email = f.m_Email where m.m_Nickname=#{m_Nickname} and f.m_Email2=#{m_Email}
+	</select>
+	
+	<insert id="friendinsert" parameterType="bitcamp.travelmaker.dto.MemberDTO">
+		insert into friend values (#{m_Email},#{m_Email2},3)
+	</insert>
+	
+	<insert id="friendinsert1" parameterType="bitcamp.travelmaker.dto.MemberDTO">
+		insert into friend values (#{m_Email},#{m_Email2},1)
+	</insert>
+	
+	<select id="friendlist" parameterType="String" resultType="bitcamp.travelmaker.dto.MemberDTO">
+		select * from(select m.m_Email,m.m_Nickname,m.m_Image,f.m_Email2,f.f_Status from member m join friend f on m.m_Email=f.m_Email where f.m_Email in(select m_Email2 from friend where m_Email =#{m_Email})) where m_Email2=#{m_Email}  
+	</select>
+	
+	<delete id="friendcancel" parameterType="bitcamp.travelmaker.dto.MemberDTO">
+		delete from friend where m_Email=#{m_Email} and m_Email2 = #{m_Email2}
+	</delete>
+	
+<!-- 	<select id="friendlistr" parameterType="String" resultType="bitcamp.travelmaker.dto.MemberDTO"> -->
+<!-- 		select m.m_Email, m.m_Nickname,m.m_Image,f.m_Email2,f.f_Status from member m join friend f on m.m_Email=f.m_Email where f.m_Email2 =#{m_Email} -->
+<!-- 	</select> -->
+	
+	<update id="friendaccept" parameterType="bitcamp.travelmaker.dto.MemberDTO">
+			update friend
+				set f_Status=2 where m_Email = #{m_Email} and m_Email2 = #{m_Email2}
+	</update>
+<!-- 	<delete id="friendcanceldel" parameterType="bitcamp.travelmaker.dto.MemberDTO"> -->
+<!-- 		delete from friend where m_Email=#{m_Email} and m_Email2 = #{m_Email2} -->
+<!-- 	</delete> -->
+<!-- 	<update id="friendaccept1" parameterType="bitcamp.travelmaker.dto.MemberDTO"> -->
+<!-- 			update friend -->
+<!-- 				set f_Status=2 where m_Email = #{m_Email} and m_Email2 = #{m_Email2} -->
+<!-- 	</update> -->
+	<select id="getFriendlist" parameterType="String" resultType="bitcamp.travelmaker.dto.MemberDTO">
+ 		select m_nickname, m_image from member where m_email in (select m_email2 from friend where m_email = #{m_email})
+ 	</select>
+ 	
+ 	<select id="mypageMemberNick" parameterType="String"
+						   resultType="bitcamp.travelmaker.dto.MemberDTO">
+	 select * from member where m_Nickname = #{m_Nickname}
+	</select>
+	
+	<select id="blackcheck" parameterType="String" resultType="int">
+		select count(*) from blacklist where m_email=#{m_Email}
+	</select>
+	
+	<select id="getMemberlist" resultType="bitcamp.travelmaker.dto.MemberDTO">
+		select m_Nickname from member
+	</select>
+	
+ 	<select id="countMember" resultType="int">
+ 		select count(*) from member
+ 	</select>
+ 	
+ 	<delete id="frienddelete" parameterType="bitcamp.travelmaker.dto.MemberDTO">
+		delete from 
+		friend 
+		where 
+		m_Email=#{m_Email} and m_Email2=#{m_Email2}
+		or
+		m_Email2=#{m_Email} and m_Email=#{m_Email2}
+	</delete>
+	
+</mapper>

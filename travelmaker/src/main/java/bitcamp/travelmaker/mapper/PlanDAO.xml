@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bitcamp.travelmaker.mypage.dao.PlanDAO">
+	<insert id="planreg" parameterType="bitcamp.travelmaker.mypage.dto.PlanDTO">
+	<selectKey keyProperty="p_Num" resultType="int" order="BEFORE">
+		select p_Seq.nextval from dual
+		</selectKey>
+		insert into planner (p_Num,m_Email,p_Sdate,p_Edate,p_Content
+		<choose>
+		<when test="g_Num!=null">
+		,g_Num)
+		</when>
+		<otherwise>
+		)
+		</otherwise>
+		</choose> 
+		values(#{p_Num},#{m_Email},#{p_Sdate},#{p_Edate},#{p_Content}
+		<choose>
+		<when test="g_Num!=null">
+		,#{g_Num})
+		</when>
+		<otherwise>
+		)
+		</otherwise>
+		</choose> 
+	</insert>
+
+	<select id="planlist" parameterType="String"
+						  resultType="bitcamp.travelmaker.mypage.dto.PlanDTO">
+		select * from planner where m_Email = #{m_Email}					  
+	</select>
+	
+	<delete id="plandel" parameterType="int">
+		delete from planner where p_Num = #{p_Num}
+	</delete>
+	
+	<delete id="plandelgo" parameterType="int">
+		delete from planner where g_Num=#{g_Num}
+	</delete>
+	
+	<update id="planupdate" parameterType="int">
+		update planner set p_Sdate=#{p_Sdate},p_Edate=#{p_Edate}, p_Content=#{p_Content} where p_Num=#{p_Num}
+	</update>
+	
+	<update id="planupdatego" parameterType="bitcamp.travelmaker.mypage.dto.PlanDTO">
+		update planner set p_Sdate=#{p_Sdate},p_Edate=#{p_Edate}, p_Content=#{p_Content} where g_Num=#{g_Num}
+	</update>
+	
+	<select id="plansel" parameterType="int"
+						resultType="bitcamp.travelmaker.mypage.dto.PlanDTO">
+		select * from planner where p_Num=#{p_Num}
+	</select>
+</mapper>

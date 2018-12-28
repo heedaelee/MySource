@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bitcamp.travelmaker.reviewpage.dao.TravelDAO">
+	<insert id="insertTravel" parameterType="bitcamp.travelmaker.reviewpage.dto.TravelDTO">
+	<selectKey keyProperty="t_Num" resultType="int" order="BEFORE">
+		select t_Seq.nextval from dual
+	</selectKey>
+		insert into travel (t_Num,m_Email,t_Title,t_Image,t_Content,t_Country,t_Local,t_Longitude,t_Latitude,t_Regdate,t_Status,t_hit) 
+		values(#{t_Num},#{m_Email},#{t_Title},#{t_Image},#{t_Content},#{t_Country},#{t_Local},#{t_Longitude},#{t_Latitude},to_char(sysdate,('YY-MM-DD')),0,0)
+	</insert>
+	
+	<insert id="insertImage" parameterType="bitcamp.travelmaker.reviewpage.dto.TImageDTO">
+		insert into TIMAGE (t_Num,ti_image) 
+		values(#{t_Num},#{ti_Image})
+	</insert>
+	
+	<select id="getReviewList" parameterType="bitcamp.travelmaker.paging.PagingVo" resultType="bitcamp.travelmaker.reviewpage.dto.TravelDTO">
+	  	select * from(select ROWNUM RNUM, P.* from (select * from(select t.t_num,(select count(*) from reply r where t.t_Num=r.t_Num) as recount,t.t_content,t.t_title,t.t_regdate,m.m_nickname,
+		t.t_image,t.t_hit,m.m_image,t.t_country,m.m_social from travel t join member m on t.m_email=m.m_email) group by t_num,recount,t_content,t_title,t_regdate,m_nickname,t_image,t_hit,m_image,t_country,m_social order by t_Num desc) P
+		WHERE ROWNUM<![CDATA[<]]>=#{last} ) Q
+    	WHERE Q.RNUM<![CDATA[>]]>=#{start}
+	</select>
+	
+	<select id="getReviewLike" parameterType="bitcamp.travelmaker.paging.PagingVo" resultType="bitcamp.travelmaker.reviewpage.dto.TravelDTO">
+	 		select * from(select ROWNUM RNUM, P.* from (select * from(select t.t_num,(select count(*) from reply r where t.t_Num=r.t_Num) as recount,
+	 		t.t_content,t.t_title,t.t_regdate,m.m_nickname,	t.t_image,t.t_hit,m.m_image,t.t_status,t.t_country,m.m_social from travel t join member m
+	 		 on t.m_email=m.m_email) group by t_num,recount,t_content,t_title,t_regdate,m_nickname,t_image,t_hit,m_image,t_status,t_country,m_social
+	 		  order by t_status desc) P
+		WHERE ROWNUM<![CDATA[<]]>=#{last} ) Q
+    	WHERE Q.RNUM<![CDATA[>]]>=#{start}
+	</select>
+	
+	<select id="getReviewhit" parameterType="bitcamp.travelmaker.paging.PagingVo" resultType="bitcamp.travelmaker.reviewpage.dto.TravelDTO">
+	 	select * from(select ROWNUM RNUM, P.* from (select * from(select t.t_num,(select count(*) from reply r where t.t_Num=r.t_Num) as recount,t.t_content,t.t_title,t.t_regdate,m.m_nickname,
+		t.t_image,t.t_hit,m.m_image,t.t_country,m.m_social from travel t join member m on t.m_email=m.m_email) group by t_num,recount,t_content,t_title,t_regdate,m_nickname,t_image,t_hit,m_image,t_country,m_social order by t_hit desc) P
+		WHERE ROWNUM<![CDATA[<]]>=#{last} ) Q
+    	WHERE Q.RNUM<![CDATA[>]]>=#{start}
+	</select>
+	
+	<select id="reviewSearch" parameterType="java.util.Map" resultType="bitcamp.travelmaker.reviewpage.dto.TravelDTO">
+	 	select t.t_Num,(select count(*) from reply r where t.t_Num=r.t_Num) as recount,t.t_content,t.t_title,t.t_regdate,m.m_nickname,t.t_image,t.t_hit,m.m_Image,t.t_status,t.t_country,m.m_social  from travel t join member m on t.m_email = m.m_email where ${type} like '%'||#{search}||'%' 
+	</select>
+	
+	<select id="getReviewDetail" parameterType="int"
+								resultType="bitcamp.travelmaker.reviewpage.dto.TravelDTO">
+		select m.m_Email,t.t_num,t.t_Image,t.t_Longitude,t.t_Latitude,t.t_Country,t.t_Local,m.m_Image,m.m_nickname,t.t_regdate,t.t_content,t.t_title,t.t_Hit,t.t_Status from travel t join member m on t.m_Email=m.m_Email where t.t_num=#{t_Num}							
+	</select>
+	
+	<select id="getReviewImage" parameterType="int"
+								resultType="bitcamp.travelmaker.reviewpage.dto.TImageDTO">
+		select ti_image from tImage where t_num=#{t_Num}							
+	</select>
+	
+	<update id="updateHit" parameterType="int">
+		update travel set t_hit=t_hit+1 where t_num=#{t_Num} 
+	</update>
+	
+	<update id="updateTravel" parameterType="bitcamp.travelmaker.reviewpage.dto.TravelDTO">
+		update travel set t_Title=#{t_Title},t_Image=#{t_Image},t_Content=#{t_Content},t_Country=#{t_Country}
+		,t_Local=#{t_Local},t_Longitude=#{t_Longitude},t_Latitude=#{t_Latitude} where t_Num=#{t_Num}
+	</update>
+	
+	<update id="updateImage" parameterType="bitcamp.travelmaker.reviewpage.dto.TImageDTO">
+		update TImage set ti_Image=#{ti_Image} where t_Num=#{t_Num}
+	</update>
+	
+	<delete id="reviewImgDel" parameterType="int">
+		delete from Timage where t_Num=#{t_Num}
+	</delete>
+	
+	<delete id="deletereview" parameterType="int">
+		delete from Travel where t_Num=#{t_Num}
+	</delete>
+	
+	<insert id="replyreg" parameterType="bitcamp.travelmaker.reviewpage.dto.ReplyDTO">	
+		insert into Reply (r_Num,t_Num,m_Email,r_Parent,r_Order,r_Comment,r_Regdate) 
+		values(r_seq.nextval,#{t_Num},#{m_Email},0,1,#{r_Comment},to_char(sysdate,('YY-MM-DD')))
+	</insert>
+	
+	<select id="replylist" parameterType="int"
+						   resultType="bitcamp.travelmaker.reviewpage.dto.ReplyDTO">
+		select r.r_Num,r.t_Num,m.m_Email,m.m_Nickname,m.m_Image,r.r_Parent,r.r_Order,r.r_Comment,r.r_Regdate from reply r join member m on r.m_Email=m.m_Email where r.t_Num=#{t_Num} START WITH r_Parent=0 CONNECT BY PRIOR r_Num=r_Parent ORDER SIBLINGS BY r_Order asc		   
+	</select>
+	
+	<insert id="rerereg" parameterType="bitcamp.travelmaker.reviewpage.dto.ReplyDTO">	
+		insert into Reply (r_Num,t_Num,m_Email,r_Parent,r_Order,r_Comment,r_Regdate) 
+		values(r_seq.nextval,#{t_Num},#{m_Email},#{r_Parent},
+		<choose>
+			<when test="r_Parent != 0">
+				nvl((select * from (select r_order+1 as r_order from reply where r_parent=#{r_Parent} order by r_Order desc) where rownum=1),2)
+			</when>
+		</choose>
+		,#{r_Comment},to_char(sysdate,('YY-MM-DD')))
+	</insert>
+	
+	<update id="replyupdate" parameterType="bitcamp.travelmaker.reviewpage.dto.ReplyDTO">	
+		update reply set r_Comment=#{r_Comment} where r_Num=#{r_Num}
+	</update>
+	
+	<delete id="replydelete" parameterType="int">
+		delete from reply where r_Num=#{r_Num}
+	</delete>
+	
+	<select id="getReviewAdmin" parameterType="String"
+						   resultType="bitcamp.travelmaker.reviewpage.dto.TravelDTO">
+	 select * from travel where m_Email = #{m_Email}
+	</select>
+	
+	<select id="getReviewMypage" parameterType="String"
+						   resultType="bitcamp.travelmaker.reviewpage.dto.TravelDTO">
+	select * from travel where m_Email = #{m_Email} order by t_Num asc
+	</select>
+	
+	<insert id="likereg" parameterType="bitcamp.travelmaker.reviewpage.dto.LikeDTO">
+		insert into good (l_num,t_Num,m_Email) 
+		values(l_seq.nextval,#{t_Num},#{m_Email})
+	</insert>
+	
+	<delete id="likedel" parameterType="int">
+		delete from good where m_Email=#{m_Email}
+	</delete>
+	
+	<select id="checklike" parameterType="bitcamp.travelmaker.reviewpage.dto.LikeDTO" resultType="int">
+		select count(*) from good where m_Email = #{m_Email} and t_Num=#{t_Num} 
+	</select>
+	
+	<update id="updateLike" parameterType="int">
+		update travel set t_status=t_status+1 where t_num=#{t_Num} 
+	</update>
+	
+	<update id="updateLi" parameterType="int">
+		update travel set t_status=t_status-1 where t_num=#{t_Num} 
+	</update>
+	
+	<select id="likecount" parameterType="int"
+							resultType="int">
+		select count(*) from good where t_Num=#{t_Num}
+	</select>
+	
+	<select id="allReview" resultType="int">
+		select count(*) from travel
+	</select>
+	
+	<select id="getMapLatLng"  resultType="bitcamp.travelmaker.reviewpage.dto.TravelDTO">
+		select * from travel where m_Email = #{m_Email}
+	</select>
+	
+	<select id="getMainReview" resultType="bitcamp.travelmaker.reviewpage.dto.TravelDTO">
+		select * from (select * from travel t join member m on m.m_Email=t.m_Email order by t.t_status desc) where rownum <![CDATA[<]]>=6
+	</select>
+	
+	<select id="travelReport" resultType="bitcamp.travelmaker.reviewpage.dto.TravelDTO">
+       select t_country as country, count(*) T_COUNTRY from travel 
+	    group by t_country
+	    order by t_country desc
+ 	</select>
+ 	
+ 	<delete id="deletereviewreple" parameterType="int">
+ 		delete from reply where t_Num=#{t_Num}
+ 	</delete>
+ 	
+ 	<delete id="deletegood" parameterType="int">
+ 		delete from good where t_Num=#{t_Num}
+ 	</delete>
+</mapper>

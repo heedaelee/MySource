@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+<!-- 
+  1단계 구성
+  요청하는 페이지의 개수만큼 definition 생성해야 한다
+  ex)customer.notice > content > notice.jsp
+  ex)customer.noticeReg > content > noticeReg.jsp
+ 
+	 <definition name="customer.notice" template="/WEB-INF/views/customer/inc/layout.jsp">
+		    <put-attribute name="title"   value="bit notice list" />
+		    <put-attribute name="header"  value="/WEB-INF/views/inc/header.jsp" />
+		    <put-attribute name="footer"  value="/WEB-INF/views/inc/footer.jsp" />
+		    <put-attribute name="aside"   value="/WEB-INF/views/customer/inc/aside.jsp" />
+		    <put-attribute name="visual"  value="/WEB-INF/views/customer/inc/visual.jsp" />
+		    <put-attribute name="content" value="/WEB-INF/views/customer/notice.jsp" />
+	  </definition>
+	   <definition name="customer.noticeReg" template="/WEB-INF/views/customer/inc/layout.jsp">
+		    <put-attribute name="title"   value="bit notice list" />
+		    <put-attribute name="header"  value="/WEB-INF/views/inc/header.jsp" />
+		    <put-attribute name="footer"  value="/WEB-INF/views/inc/footer.jsp" />
+		    <put-attribute name="aside"   value="/WEB-INF/views/customer/inc/aside.jsp" />
+		    <put-attribute name="visual"  value="/WEB-INF/views/customer/inc/visual.jsp" />
+		    <put-attribute name="content" value="/WEB-INF/views/customer/noticeReg.jsp" />
+	  </definition> 
+	-->
+	<!-- 
+		2단계 구성
+		1단점을 극복하기 위해서 [중복자원]활용하기 (상속의 개념 , 재정의 개념)
+	 
+	 
+	  <definition name="customer.notice" template="/WEB-INF/views/customer/inc/layout.jsp">
+		    <put-attribute name="title"   value="bit notice list" />
+		    <put-attribute name="header"  value="/WEB-INF/views/inc/header.jsp" />
+		    <put-attribute name="footer"  value="/WEB-INF/views/inc/footer.jsp" />
+		    <put-attribute name="aside"   value="/WEB-INF/views/customer/inc/aside.jsp" />
+		    <put-attribute name="visual"  value="/WEB-INF/views/customer/inc/visual.jsp" />
+		    <put-attribute name="content" value="/WEB-INF/views/customer/notice.jsp" />
+	  </definition>
+	   <definition name="customer.noticeReg" extends="customer.notice">
+		    <put-attribute name="title"   value="bit notice Reg" />
+		    <put-attribute name="content" value="/WEB-INF/views/customer/noticeReg.jsp" />
+	  </definition>  
+	  -->
+	  <!-- 
+	  3단계
+	  2단계 코드량이 줄긴 하지만 definition 개수는 그대로 ....
+	  
+	    패턴식
+	    게시판(customer.*) 
+      customer.* => notice 
+      customer.* => notcieReg 
+      customer.* => noticeDetail 
+      customer.*.*.* {1}{2}{3} 
+      customer.* {1}
+      customer.a.b.c > {1} > a  , {2} > b , {3} > c 
+      
+          개발자 URLBase 구성을 
+      public String form(){
+           return costomer.notice; //view 주소값
+           
+           //어제까지 return "/WEB-INF/views/content.jsp"
+      }
+      public String form(){
+            return costomer.a.b.c; 
+      }  
+      아래 구조 마직막 방법 : 폴더 구조가 바뀌만 개수 ...... 
+      
+    <definition name="customer.*" template="/WEB-INF/views/customer/inc/layout.jsp">
+		    <put-attribute name="title"   value="bit notice list" />
+		    <put-attribute name="header"  value="/WEB-INF/views/inc/header.jsp" />
+		    <put-attribute name="footer"  value="/WEB-INF/views/inc/footer.jsp" />
+		    <put-attribute name="aside"   value="/WEB-INF/views/customer/inc/aside.jsp" />
+		    <put-attribute name="visual"  value="/WEB-INF/views/customer/inc/visual.jsp" />
+		    <put-attribute name="content" value="/WEB-INF/views/customer/{1}.jsp" />
+	  </definition> 
+	  <definition name="joinus.*" template="/WEB-INF/views/customer/inc/layout.jsp">
+		    <put-attribute name="title"   value="bit notice list" />
+		    <put-attribute name="header"  value="/WEB-INF/views/inc/header.jsp" />
+		    <put-attribute name="footer"  value="/WEB-INF/views/inc/footer.jsp" />
+		    <put-attribute name="aside"   value="/WEB-INF/views/joinus/inc/aside.jsp" />
+		    <put-attribute name="visual"  value="/WEB-INF/views/joinus/inc/visual.jsp" />
+		    <put-attribute name="content" value="/WEB-INF/views/joinus/{1}.jsp" />
+	  </definition> 
+	-->
+	<!-- 최종본 -->  
+	<definition name="home.*" template="/WEB-INF/views/home/layout.jsp">
+		    <put-attribute name="title"   value="Travel Maker" />
+		    <put-attribute name="header"  value="/WEB-INF/views/home/header.jsp" />
+		    <put-attribute name="footer"  value="/WEB-INF/views/home/footer.jsp" />
+		    <put-attribute name="content" value="/WEB-INF/views/{1}.jsp" />
+	</definition> 
+	<definition name="mypage.*" template="/WEB-INF/views/mypage/layout.jsp">
+		    <put-attribute name="title"   value="Travel Maker" />
+		    <put-attribute name="header"  value="/WEB-INF/views/home/header.jsp" />
+		    <put-attribute name="sidebar" value="/WEB-INF/views/mypage/sidebar.jsp"/>
+		    <put-attribute name="footer"  value="/WEB-INF/views/home/footer.jsp" />
+		    <put-attribute name="content" value="/WEB-INF/views/mypage/{1}.jsp" />
+	</definition> 
+	
+	<definition name="review.*" template="/WEB-INF/views/home/layout.jsp">
+		    <put-attribute name="title"   value="Travel Maker" />
+		    <put-attribute name="header"  value="/WEB-INF/views/home/header.jsp" />
+		    <put-attribute name="footer"  value="/WEB-INF/views/home/footer.jsp" />
+		    <put-attribute name="content" value="/WEB-INF/views/reviewpage/{1}.jsp" />
+	</definition> 
+	<definition name="gowith.*" template="/WEB-INF/views/home/layout.jsp">
+		    <put-attribute name="title"   value="Travel Maker" />
+		    <put-attribute name="header"  value="/WEB-INF/views/home/header.jsp" />
+		    <put-attribute name="footer"  value="/WEB-INF/views/home/footer.jsp" />
+		    <put-attribute name="content" value="/WEB-INF/views/gowith/{1}.jsp" />
+	</definition> 
+	
+	<definition name="adminpage.*" template="/WEB-INF/views/mypage/layout.jsp">
+		    <put-attribute name="title"   value="Travel Maker" />
+		    <put-attribute name="header"  value="/WEB-INF/views/home/header.jsp" />
+		    <put-attribute name="sidebar" value="/WEB-INF/views/admin/sidebar.jsp"/>
+		    <put-attribute name="footer"  value="/WEB-INF/views/home/footer.jsp" />
+		    <put-attribute name="content" value="/WEB-INF/views/admin/{1}.jsp" />
+	</definition> 
+	
+	<definition name="*.*" template="/WEB-INF/views/{1}/{2}.jsp">
+		    <put-attribute name="title"   value="Travel Maker" />
+	</definition> 
+	
+	
+<!-- 	<definition name="*.*" template="/WEB-INF/views/{1}/layout.jsp"> -->
+<!-- 		    <put-attribute name="title"   value="Joinus" /> -->
+<!-- 		    <put-attribute name="header"  value="/WEB-INF/views/home/header.jsp" /> -->
+<!-- 		    <put-attribute name="footer"  value="/WEB-INF/views/home/footer.jsp" /> -->
+<!-- 		    <put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp" /> -->
+<!-- 	  </definition>  -->
+</tiles-definitions>
+
+
+
+
+
+
+
+  

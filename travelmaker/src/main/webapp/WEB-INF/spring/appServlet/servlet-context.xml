@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:websocket="http://www.springframework.org/schema/websocket"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context/spring-context.xsd
+						   http://www.springframework.org/schema/tx
+ 						   http://www.springframework.org/schema/tx/spring-tx.xsd
+ 						   http://www.springframework.org/schema/mvc
+					       http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+					       http://www.springframework.org/schema/websocket  
+      					   http://www.springframework.org/schema/websocket/spring-websocket.xsd
+						   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+<!--  
+1.WebApp 필요한 객체의 생성과 조립
+2.DispatcherServlet 제공하는 IOC 컨테이너에 
+-->
+<mvc:annotation-driven/>
+<context:annotation-config />
+<!-- <context:component-scan base-package="bitcamp"/> -->
+<context:component-scan base-package="bitcamp.travelmaker.controller" />
+<context:component-scan base-package="bitcamp.travelmaker.socket" />
+<!-- <context:component-scan base-package="bitcamp.travelmaker.service" /> -->
+<context:component-scan base-package="bitcamp.travelmaker.mypage.controller" />
+<context:component-scan base-package="bitcamp.travelmaker.mypage.service" />
+<context:component-scan base-package="bitcamp.travelmaker.reviewpage.controller" />
+<context:component-scan base-package="bitcamp.travelmaker.reviewpage.service" />
+<context:component-scan base-package="bitcamp.travelmaker.gowith.controller" />
+<context:component-scan base-package="bitcamp.travelmaker.gowith.service" />
+<context:component-scan base-package="bitcamp.travelmaker.adminpage.controller" />
+	<websocket:handlers>
+		<websocket:mapping handler="login" path="/logon.htm" />
+	</websocket:handlers>
+	<websocket:handlers>
+		<websocket:mapping handler="chat" path="/chatchat.htm" />
+		<websocket:handshake-interceptors>
+			<bean class="bitcamp.travelmaker.socket.HandShakeInterceptor"></bean>
+		</websocket:handshake-interceptors>
+	</websocket:handlers>
+	
+	<bean id="login" class="bitcamp.travelmaker.socket.LoginSocketHandler"></bean>
+	<bean id="chat" class="bitcamp.travelmaker.socket.ChatSocketHandler"></bean>
+
+<!--  Tiles 설정하기 -->
+<bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+	 <property name="definitions">
+		  <list>
+		   	<value>/WEB-INF/Tiles.xml</value>
+		  </list>
+	 </property>
+</bean>
+<!-- urlBased 리턴 되는 주소형태의 값으로 타일즈 구성 -->
+<bean id="urlBasedViewResolver" 
+      class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+ 	<property name="viewClass" value="org.springframework.web.servlet.view.tiles2.TilesView" />
+</bean> 
+<!--  Tiles 설정 END --> 
+<bean name="jsonview" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
+
+<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+   <property name="dataSource" ref="driverManagerDataSource" />
+</bean>
+ <tx:annotation-driven transaction-manager="transactionManager"/>
+
+<bean id="loginSuccessHandler" class="bitcamp.travelmaker.security.LoginSuccessHandler"></bean>
+<bean id="loginFailHandler" class="bitcamp.travelmaker.security.LoginFailHandler"></bean>
+
+
+</beans>
+
+
+
+

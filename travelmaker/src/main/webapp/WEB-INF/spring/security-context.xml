@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	 xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context.xsd
+  						http://www.springframework.org/schema/security 
+  						http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<!-- 로그인 -->
+
+	<security:http>
+	<security:csrf disabled="true" />
+	<security:form-login login-page="/login" 
+	    authentication-failure-url="/index.htm?error"
+	    default-target-url="/index.htm"
+		authentication-failure-handler-ref="loginFailHandler"
+		username-parameter="m_Email"
+		password-parameter="m_Pwd" />
+	<security:session-management invalid-session-url="/index.htm" >
+		<security:concurrency-control max-sessions="1" expired-url="/index.htm"/>
+	</security:session-management>
+	<security:logout logout-success-url="/index.htm" />
+	
+	
+
+	<security:intercept-url pattern="/mypage.htm" access="hasRole('ROLE_USER')" />
+	<security:intercept-url pattern="/visited.htm" access="hasRole('ROLE_USER')" />
+	<security:intercept-url pattern="/myfeedgowith.htm" access="hasRole('ROLE_USER')" />
+	<security:intercept-url pattern="/myfeedreview.htm" access="hasRole('ROLE_USER')" />
+	<security:intercept-url pattern="/schedule.htm" access="hasRole('ROLE_USER')" />
+	<security:intercept-url pattern="/friendlist.htm" access="hasRole('ROLE_USER')" />
+	<security:intercept-url pattern="/myreviewdetail.htm" access="hasRole('ROLE_USER')" />
+	
+	<security:intercept-url pattern="/adminpage.htm" access="hasRole('ROLE_ADMIN')" />
+	<security:intercept-url pattern="/memberfeed.htm" access="hasRole('ROLE_ADMIN')" />
+	<security:intercept-url pattern="/memberreview.htm" access="hasRole('ROLE_ADMIN')" />
+	<security:intercept-url pattern="/blacklist.htm" access="hasRole('ROLE_ADMIN')" />
+	<security:intercept-url pattern="/memberreport.htm" access="hasRole('ROLE_ADMIN')" />
+	<security:intercept-url pattern="/travelreport.htm" access="hasRole('ROLE_ADMIN')" />
+</security:http>
+<security:authentication-manager>
+	<security:authentication-provider>
+		<security:jdbc-user-service 
+			authorities-by-username-query="select m.m_Email,a.A_Name from Member m join mauthority ma on m.m_Email=ma.m_Email join authority a on ma.a_code=a.a_code where m.m_email=?"
+			users-by-username-query="select m_Email, m_Pwd as password, 1 enabled from Member where m_Email=?"
+			data-source-ref="driverManagerDataSource"
+		/><!-- db연결 -->
+		
+		<security:password-encoder ref="bCryptPasswordEncoder" />
+	</security:authentication-provider>
+</security:authentication-manager>
+<!-- <bean id="loginSuccessHandler" class="bitcamp.travelmaker.security.LoginSuccessHandler"></bean> -->
+<bean id="loginFailHandler" class="bitcamp.travelmaker.security.LoginFailHandler"></bean>
+<!-- <bean id="authenticationFilterAnotherParam" class="bitcamp.travelmaker.security.AuthenticationFilterAnotherParam"></bean> -->
+<!-- <context:component-scan base-package="bitcamp.travelmaker.controller" /> -->
+<context:component-scan base-package="bitcamp.travelmaker.service" />
+</beans>
