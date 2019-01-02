@@ -84,8 +84,7 @@ public class MailService {
 			service.passChange(memberdto);
 		
 		//"./src/main/resources/templates/"
-			Template template = velocityEngine
-					.getTemplate(mail.getTemplateName());
+			Template template = velocityEngine.getTemplate(mail.getTemplateName());
 
 			StringWriter stringWriter = new StringWriter();
 			template.merge(velocityContext, stringWriter);
