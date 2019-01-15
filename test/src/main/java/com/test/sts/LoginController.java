@@ -36,4 +36,10 @@ public class LoginController {
 		return "home";
 	}
 	
+	@RequestMapping(value = "/naverlogin", method = RequestMethod.GET)
+	public String login(Model model) {
+		
+		return "naverlogin";
+	}
+	
 }

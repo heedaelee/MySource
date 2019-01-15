@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <!doctype html>
 <html lang="ko">
 <head>
@@ -6,12 +8,12 @@
 </head>
 <body>
 <script type="text/javascript">
-  var naver_id_login = new naver_id_login("sLKp6zrzm0kadWwbPdE0", "http://192.168.0.8:8080/test/callback.jsp");
-  // 접근 토큰 값 출력
+  var naver_id_login = new naver_id_login("sLKp6zrzm0kadWwbPdE0", "http://192.168.0.18:8080/test/callback.jsp");
+//접근 토큰 값 출력
   alert(naver_id_login.oauthParams.access_token);
-  // 네이버 사용자 프로필 조회
+//// 네이버 사용자 프로필 조회
   naver_id_login.get_naver_userprofile("naverSignInCallback()");
-  // 네이버 사용자 프로필 조회 이후 프로필 정보를 처리할 callback function
+//네이버 사용자 프로필 조회 이후 프로필 정보를 처리할 callback function
   function naverSignInCallback() {
     alert(naver_id_login.getProfileData('email'));
     alert(naver_id_login.getProfileData('nickname'));
